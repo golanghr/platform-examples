@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package main;
+package hello;
 
 import "github.com/golanghr/platform/protos/service.proto";
 

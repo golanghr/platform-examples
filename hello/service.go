@@ -27,6 +27,7 @@ SOFTWARE.
 package main
 
 import (
+	pb "github.com/golanghr/platform-examples/hello/protos"
 	"github.com/golanghr/platform/logging"
 	"github.com/golanghr/platform/options"
 	"github.com/golanghr/platform/server"
@@ -80,7 +81,7 @@ func NewService(opts options.Options, logger *logging.Entry) (*Service, error) {
 		Entry:    logger,
 	}
 
-	RegisterHelloServer(sc.GrpcServer(), sc)
+	pb.RegisterHelloServer(sc.GrpcServer(), sc)
 
 	return sc, nil
 }

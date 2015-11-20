@@ -3,7 +3,7 @@ NAME = hello
 GO ?= go
 PROTOC ?= protoc
 
-PROTOCFLAGS = --go_out=plugins=grpc:.
+PROTOCFLAGS = --go_out=plugins=grpc:protos
 PROTOSPATH = protos
 PLATFORMPROTOPATH = $(GOPATH)/src
 PROTOS = protos/*.proto

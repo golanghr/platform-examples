@@ -3,7 +3,7 @@
 // DO NOT EDIT!
 
 /*
-Package main is a generated protocol buffer package.
+Package hello is a generated protocol buffer package.
 
 It is generated from these files:
 	hello.proto
@@ -11,7 +11,7 @@ It is generated from these files:
 It has these top-level messages:
 	HelloWorld
 */
-package main
+package hello
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
@@ -37,7 +37,7 @@ func (m *HelloWorld) String() string { return proto.CompactTextString(m) }
 func (*HelloWorld) ProtoMessage()    {}
 
 func init() {
-	proto.RegisterType((*HelloWorld)(nil), "main.HelloWorld")
+	proto.RegisterType((*HelloWorld)(nil), "hello.HelloWorld")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -60,7 +60,7 @@ func NewHelloClient(cc *grpc.ClientConn) HelloClient {
 
 func (c *helloClient) HelloWorld(ctx context.Context, in *platform.Request, opts ...grpc.CallOption) (*platform.Response, error) {
 	out := new(platform.Response)
-	err := grpc.Invoke(ctx, "/main.Hello/HelloWorld", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/hello.Hello/HelloWorld", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func _Hello_HelloWorld_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 var _Hello_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "main.Hello",
+	ServiceName: "hello.Hello",
 	HandlerType: (*HelloServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
