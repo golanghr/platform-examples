@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package main;
+
+import "github.com/golanghr/platform/protos/service.proto";
+
+service Hello {
+  rpc HelloWorld (platform.Request) returns (platform.Response) {}
+}
+
+message HelloWorld {
+  string message = 1;
+}
