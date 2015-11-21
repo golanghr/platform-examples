@@ -40,11 +40,15 @@ var (
 		"service-version":     getFloat(utils.GetFromEnvOr("HELLO_SERVICE_VERSION", "0.1")),
 		"formatter":           "text",
 		"level":               logrus.DebugLevel,
-		"grpc-listen-forever": getBool(utils.GetFromEnvOr("HELLO_SERVICE_GRPC_LISTEN_FOREVER", "true")),
-		"grpc-addr":           utils.GetFromEnvOr("HELLO_SERVICE_GRPC_ADDR", ":4778"),
-		"grpc-tls":            getBool(utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS", "true")),
-		"grpc-tls-cert":       utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_CERT", "../test_data/server.crt"),
-		"grpc-tls-key":        utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_KEY", "../test_data/server.key"),
+		"manager-interrupt-wait-timeout": getInt(utils.GetFromEnvOr("HELLO_SERVICE_MANAGER_INTERRUPT_TIMEOUT", "1")),
+		"grpc-listen-forever":            getBool(utils.GetFromEnvOr("HELLO_SERVICE_GRPC_LISTEN_FOREVER", "true")),
+		"grpc-addr":                      utils.GetFromEnvOr("HELLO_SERVICE_GRPC_ADDR", ":4778"),
+		"grpc-tls":                       getBool(utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS", "true")),
+		"grpc-tls-domain":                utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_DOMAIN", "golang.hr"),
+		"grpc-tls-cert":                  utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_CERT", "../test_data/server.crt"),
+		"grpc-tls-key":                   utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_KEY", "../test_data/server.key"),
+		"http-addr":                      utils.GetFromEnvOr("HELLO_SERVICE_HTTP_ADDR", ":8070"),
+		"http-listen-forever":            getBool(utils.GetFromEnvOr("HELLO_SERVICE_HTTP_LISTEN_FOREVER", "true")),
 	}
 )
 
@@ -56,4 +60,9 @@ func getBool(env string) bool {
 func getFloat(env string) float64 {
 	f, _ := strconv.ParseFloat(env, 64)
 	return f
+}
+
+func getInt(val string) int {
+	i, _ := strconv.Atoi(val)
+	return i
 }

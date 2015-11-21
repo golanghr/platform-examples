@@ -2,12 +2,17 @@ syntax = "proto3";
 
 package hello;
 
+import "github.com/gengo/grpc-gateway/third_party/googleapis/google/api/annotations.proto";
 import "github.com/golanghr/platform/protos/service.proto";
-
-service Hello {
-  rpc HelloWorld (platform.Request) returns (platform.Response) {}
-}
 
 message HelloWorld {
   string message = 1;
+}
+
+service Hello {
+  rpc HelloWorld (platform.Request) returns (hello.HelloWorld) {
+    option (google.api.http) = {
+      get: "/v1/example/hello"
+    };
+  }
 }

@@ -27,13 +27,14 @@ SOFTWARE.
 package main
 
 import (
+	pb "github.com/golanghr/platform-examples/hello/protos"
 	"github.com/golanghr/platform/protos"
 	"golang.org/x/net/context"
 )
 
-// Hello -
-func (s *Service) HelloWorld(ctx context.Context, in *platform.Request) (*platform.Response, error) {
-	return &platform.Response{
-		Payload: []byte(""),
-	}, nil
+// HelloWorld - Depending on server type (http, grpc, ...) will return back new simple response.
+// If this is HTTP, it will return back application/json with HelloWorld being serialized into json
+// If this is GRPC, it will return back entire hello.HelloWorld as bytes
+func (s *Service) HelloWorld(ctx context.Context, in *platform.Request) (*pb.HelloWorld, error) {
+	return &pb.HelloWorld{Message: "Hello From Golang.HR Micro Platform!"}, nil
 }

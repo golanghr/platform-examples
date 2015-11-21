@@ -27,8 +27,12 @@ SOFTWARE.
 package main
 
 import (
+	"syscall"
+
 	pb "github.com/golanghr/platform-examples/hello/protos"
+	"github.com/golanghr/platform/handlers"
 	"github.com/golanghr/platform/logging"
+	"github.com/golanghr/platform/manager"
 	"github.com/golanghr/platform/options"
 	"github.com/golanghr/platform/server"
 	"github.com/golanghr/platform/service"
@@ -44,9 +48,15 @@ type Service struct {
 	// Servicer - Is a Servicer interface
 	service.Servicer
 
-	// Serverer - Here GRPC server is located. The thing is, we really need just
-	// gRPC so we're not going to complicate this struct more than needed
-	server.Serverer
+	// Grpc - Here GRPC server is located.
+	Grpc server.Serverer
+
+	// HTTP - Here HTTP server is located.
+	HTTP server.Serverer
+
+	// Managerer - Service runtime manager. Manager actually contains start, stop
+	// and all of the runtime related management handlers.
+	manager.Managerer
 
 	// Logging -
 	*logging.Entry
@@ -56,7 +66,13 @@ type Service struct {
 // I understand that this looks like a hack but I'd rather have it require to satisfy interface
 // than having it require to satisfy nil.
 func (s *Service) GrpcServer() *grpc.Server {
-	return s.Serverer.Interface().(*server.Grpc).Server
+	return s.Grpc.Interface().(*server.Grpc).Server
+}
+
+// Terminate - Will send SIGTERM towards service interrupt signal resulting entire
+// service to go down
+func (s *Service) Terminate() {
+	s.GetInterruptChan() <- syscall.SIGTERM
 }
 
 // NewService -
@@ -74,14 +90,45 @@ func NewService(opts options.Options, logger *logging.Entry) (*Service, error) {
 		return nil, err
 	}
 
+	httpServer, err := server.NewHTTPServer(serv, opts, logger)
+
+	if err != nil {
+		return nil, err
+	}
+
+	serviceManager, err := manager.New(serv, opts, logger)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// We are about to attach GRPC service now ...
+	if err := serviceManager.Attach("grpc", grpcServer); err != nil {
+		return nil, err
+	}
+
+	// We are about to attach HTTP service now ...
+	if err := serviceManager.Attach("http", httpServer); err != nil {
+		return nil, err
+	}
+
 	sc := &Service{
-		Options:  opts,
-		Servicer: serv,
-		Serverer: grpcServer,
-		Entry:    logger,
+		Options:   opts,
+		Servicer:  serv,
+		Grpc:      grpcServer,
+		HTTP:      httpServer,
+		Entry:     logger,
+		Managerer: serviceManager,
 	}
 
 	pb.RegisterHelloServer(sc.GrpcServer(), sc)
 
+	hander, err := handlers.NewHttpGrpcHandler(serv, logger, pb.RegisterHelloHandler)
+
+	if err != nil {
+		return nil, err
+	}
+
+	httpServer.Interface().(*server.HTTP).Handler = hander
 	return sc, nil
 }
