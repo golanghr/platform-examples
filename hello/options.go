@@ -45,8 +45,8 @@ var (
 		"grpc-addr":                      utils.GetFromEnvOr("HELLO_SERVICE_GRPC_ADDR", ":4778"),
 		"grpc-tls":                       getBool(utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS", "true")),
 		"grpc-tls-domain":                utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_DOMAIN", "golang.hr"),
-		"grpc-tls-cert":                  utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_CERT", "../test_data/server.crt"),
-		"grpc-tls-key":                   utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_KEY", "../test_data/server.key"),
+		"grpc-tls-cert":                  utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_CERT", "test_data/server.crt"),
+		"grpc-tls-key":                   utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_KEY", "test_data/server.key"),
 		"http-addr":                      utils.GetFromEnvOr("HELLO_SERVICE_HTTP_ADDR", ":8070"),
 		"http-listen-forever":            getBool(utils.GetFromEnvOr("HELLO_SERVICE_HTTP_LISTEN_FOREVER", "true")),
 	}

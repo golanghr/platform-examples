@@ -32,10 +32,10 @@ import (
 	pb "github.com/golanghr/platform-examples/hello/protos"
 	"github.com/golanghr/platform/handlers"
 	"github.com/golanghr/platform/logging"
-	"github.com/golanghr/platform/manager"
+	"github.com/golanghr/platform/managers"
 	"github.com/golanghr/platform/options"
-	"github.com/golanghr/platform/server"
-	"github.com/golanghr/platform/service"
+	"github.com/golanghr/platform/servers"
+	"github.com/golanghr/platform/services"
 	"google.golang.org/grpc"
 )
 
@@ -46,17 +46,17 @@ type Service struct {
 	options.Options
 
 	// Servicer - Is a Servicer interface
-	service.Servicer
+	services.Servicer
 
 	// Grpc - Here GRPC server is located.
-	Grpc server.Serverer
+	Grpc servers.Serverer
 
 	// HTTP - Here HTTP server is located.
-	HTTP server.Serverer
+	HTTP servers.Serverer
 
 	// Managerer - Service runtime manager. Manager actually contains start, stop
 	// and all of the runtime related management handlers.
-	manager.Managerer
+	managers.Managerer
 
 	// Logging -
 	*logging.Entry
@@ -66,7 +66,7 @@ type Service struct {
 // I understand that this looks like a hack but I'd rather have it require to satisfy interface
 // than having it require to satisfy nil.
 func (s *Service) GrpcServer() *grpc.Server {
-	return s.Grpc.Interface().(*server.Grpc).Server
+	return s.Grpc.Interface().(*servers.Grpc).Server
 }
 
 // Terminate - Will send SIGTERM towards service interrupt signal resulting entire
@@ -78,25 +78,25 @@ func (s *Service) Terminate() {
 // NewService -
 func NewService(opts options.Options, logger *logging.Entry) (*Service, error) {
 
-	serv, err := service.New(opts)
+	serv, err := services.New(opts)
 
 	if err != nil {
 		return nil, err
 	}
 
-	grpcServer, err := server.NewGrpcServer(serv, opts, logger)
+	grpcServer, err := servers.NewGrpcServer(serv, opts, logger)
 
 	if err != nil {
 		return nil, err
 	}
 
-	httpServer, err := server.NewHTTPServer(serv, opts, logger)
+	httpServer, err := servers.NewHTTPServer(serv, opts, logger)
 
 	if err != nil {
 		return nil, err
 	}
 
-	serviceManager, err := manager.New(serv, opts, logger)
+	serviceManager, err := managers.New(serv, opts, logger)
 
 	if err != nil {
 		return nil, err
@@ -129,6 +129,6 @@ func NewService(opts options.Options, logger *logging.Entry) (*Service, error) {
 		return nil, err
 	}
 
-	httpServer.Interface().(*server.HTTP).Handler = hander
+	httpServer.Interface().(*servers.HTTP).Handler = hander
 	return sc, nil
 }
