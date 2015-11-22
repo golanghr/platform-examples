@@ -35,9 +35,7 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	"github.com/Sirupsen/logrus"
-	"github.com/golang/protobuf/proto"
 	"github.com/golanghr/platform/options"
-	"github.com/golanghr/platform/protos"
 	"github.com/golanghr/platform/utils"
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -55,8 +53,9 @@ func getHelloOptions() (options.Options, error) {
 		"grpc-listen-forever":            getBool(utils.GetFromEnvOr("HELLO_SERVICE_GRPC_LISTEN_FOREVER", "true")),
 		"grpc-addr":                      utils.GetFromEnvOr("HELLO_SERVICE_GRPC_ADDR", ":4771"),
 		"grpc-tls":                       getBool(utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS", "true")),
-		"grpc-tls-cert":                  utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_CERT", "../test_data/server.crt"),
-		"grpc-tls-key":                   utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_KEY", "../test_data/server.key"),
+		"grpc-tls-domain":                utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_DOMAIN", "golang.hr"),
+		"grpc-tls-cert":                  utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_CERT", "test_data/server.crt"),
+		"grpc-tls-key":                   utils.GetFromEnvOr("HELLO_SERVICE_GRPC_TLS_KEY", "test_data/server.key"),
 		"http-addr":                      utils.GetFromEnvOr("HELLO_SERVICE_HTTP_ADDR", ":8072"),
 		"http-listen-forever":            getBool(utils.GetFromEnvOr("HELLO_SERVICE_HTTP_LISTEN_FOREVER", "true")),
 	})
@@ -82,28 +81,24 @@ func TestGRPCServerExample(t *testing.T) {
 		address, ok := service.Options.Get("grpc-addr")
 		So(ok, ShouldBeTrue)
 
-		var opts []grpc.DialOption
+		var gopts []grpc.DialOption
 
 		var creds credentials.TransportAuthenticator
-		creds, err = credentials.NewClientTLSFromFile("../test_data/server.crt", "golang.hr")
+		domain, _ := opts.Get("grpc-tls-domain")
+		creds, err = credentials.NewClientTLSFromFile("test_data/server.crt", domain.String())
 		So(err, ShouldBeNil)
 
-		opts = append(opts, grpc.WithTransportCredentials(creds))
+		gopts = append(gopts, grpc.WithTransportCredentials(creds))
 
-		conn, err := grpc.Dial(address.String(), opts...)
+		conn, err := grpc.Dial(address.String(), gopts...)
 		So(err, ShouldBeNil)
 		defer conn.Close()
 
 		client := pb.NewHelloClient(conn)
 
-		resp, err := client.HelloWorld(context.Background(), &platform.Request{})
+		helloResponse, err := client.HelloWorld(context.Background(), &pb.HelloRequest{})
 		So(err, ShouldBeNil)
-
-		hw := &pb.HelloWorld{}
-		err = proto.Unmarshal(resp.Payload, hw)
-		So(err, ShouldBeNil)
-
-		So(hw.Message, ShouldContainSubstring, "Hello From Golang.HR Micro Platform!")
+		So(helloResponse.Message, ShouldContainSubstring, "Hello From Golang.HR Micro Platform!")
 	})
 }
 
