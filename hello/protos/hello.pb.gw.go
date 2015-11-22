@@ -18,7 +18,6 @@ import (
 	"github.com/gengo/grpc-gateway/utilities"
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
-	"github.com/golanghr/platform/protos"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -30,16 +29,8 @@ var _ = runtime.String
 var _ = json.Marshal
 var _ = utilities.PascalFromSnake
 
-var (
-	filter_Hello_HelloWorld_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
-)
-
 func request_Hello_HelloWorld_0(ctx context.Context, client HelloClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq platform.Request
-
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_Hello_HelloWorld_0); err != nil {
-		return nil, grpc.Errorf(codes.InvalidArgument, "%v", err)
-	}
+	var protoReq HelloRequest
 
 	return client.HelloWorld(ctx, &protoReq)
 }

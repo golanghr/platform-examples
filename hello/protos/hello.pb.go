@@ -9,6 +9,7 @@ It is generated from these files:
 	protos/hello.proto
 
 It has these top-level messages:
+	HelloRequest
 	HelloWorld
 */
 package hello
@@ -17,7 +18,6 @@ import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 import _ "github.com/gengo/grpc-gateway/third_party/googleapis/google/api"
-import platform "github.com/golanghr/platform/protos"
 
 import (
 	context "golang.org/x/net/context"
@@ -29,6 +29,13 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
+type HelloRequest struct {
+}
+
+func (m *HelloRequest) Reset()         { *m = HelloRequest{} }
+func (m *HelloRequest) String() string { return proto.CompactTextString(m) }
+func (*HelloRequest) ProtoMessage()    {}
+
 type HelloWorld struct {
 	Message string `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
 }
@@ -38,6 +45,7 @@ func (m *HelloWorld) String() string { return proto.CompactTextString(m) }
 func (*HelloWorld) ProtoMessage()    {}
 
 func init() {
+	proto.RegisterType((*HelloRequest)(nil), "hello.HelloRequest")
 	proto.RegisterType((*HelloWorld)(nil), "hello.HelloWorld")
 }
 
@@ -48,7 +56,7 @@ var _ grpc.ClientConn
 // Client API for Hello service
 
 type HelloClient interface {
-	HelloWorld(ctx context.Context, in *platform.Request, opts ...grpc.CallOption) (*HelloWorld, error)
+	HelloWorld(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloWorld, error)
 }
 
 type helloClient struct {
@@ -59,7 +67,7 @@ func NewHelloClient(cc *grpc.ClientConn) HelloClient {
 	return &helloClient{cc}
 }
 
-func (c *helloClient) HelloWorld(ctx context.Context, in *platform.Request, opts ...grpc.CallOption) (*HelloWorld, error) {
+func (c *helloClient) HelloWorld(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloWorld, error) {
 	out := new(HelloWorld)
 	err := grpc.Invoke(ctx, "/hello.Hello/HelloWorld", in, out, c.cc, opts...)
 	if err != nil {
@@ -71,7 +79,7 @@ func (c *helloClient) HelloWorld(ctx context.Context, in *platform.Request, opts
 // Server API for Hello service
 
 type HelloServer interface {
-	HelloWorld(context.Context, *platform.Request) (*HelloWorld, error)
+	HelloWorld(context.Context, *HelloRequest) (*HelloWorld, error)
 }
 
 func RegisterHelloServer(s *grpc.Server, srv HelloServer) {
@@ -79,7 +87,7 @@ func RegisterHelloServer(s *grpc.Server, srv HelloServer) {
 }
 
 func _Hello_HelloWorld_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(platform.Request)
+	in := new(HelloRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
